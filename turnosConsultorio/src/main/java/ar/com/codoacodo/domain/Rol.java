@@ -28,7 +28,9 @@ public class Rol {
     @Column(name = "rol", length = 50, unique = true)
 	private String rol;
    
-	
+	public Rol(Long id) {
+		this.id=id;
+	}
 	
 
 }

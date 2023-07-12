@@ -13,7 +13,7 @@ public class UserSecurity implements UserDetails{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L; no sé de dónde salió
 	//creo atributo
 	private final User user;
 	//Creo constructor 
@@ -26,7 +26,7 @@ public class UserSecurity implements UserDetails{
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.user.getRoles()
 				.stream()
-				.map(r -> r.getRol())//deberia devolver el listado de roles
+				.map(u -> u.getRol())//deberia devolver el listado de roles
 				.map(SimpleGrantedAuthority::new)//método reference
 				.toList();
 	}
@@ -63,7 +63,7 @@ public class UserSecurity implements UserDetails{
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
+		
 		return true;
 	}
 	

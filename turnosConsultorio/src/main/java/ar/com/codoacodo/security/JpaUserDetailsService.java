@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class JpaUserDetailsService implements UserDetailsService {
 	
 	private final UserRepository userRepository;
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = this.userRepository.findByUsername(username);

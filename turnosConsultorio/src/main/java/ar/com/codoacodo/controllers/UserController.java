@@ -8,16 +8,20 @@ import ar.com.codoacodo.Dto.UserDTO;
 import ar.com.codoacodo.Dto.UserRequestDTO;
 import ar.com.codoacodo.Dto.UserRequestPutDTO;
 import ar.com.codoacodo.Dto.UserResponseDTO;
+import ar.com.codoacodo.domain.Rol;
 import ar.com.codoacodo.domain.User;
 import ar.com.codoacodo.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+//@CrossOrigin(origins = "http://localhost:5500")
 
 @RestController //es el responsable de exponer las repuestas a los queries para el que necesite hacer la consulta,  la http://locahost:8080/user la dirección html de conexion local
 @RequestMapping("/user") //nombre tabla. El request mapping lo atiende(escucha) la clase controler
@@ -36,7 +40,7 @@ public class UserController {
     //GET, POST, PUT , DELETE  verbos para los queries que hace el frontend
     
     //necesito el service, para ello creo una variable
-    public final UserService userService;
+    private final UserService userService;
     
     
     //para obtener un recurso uso el verbo GET
@@ -68,7 +72,7 @@ public class UserController {
     
     //para crear un recurso uso el verbo POST
     @PostMapping()
-    @PreAuthorize(value = "hasRol('ROL_ADMIN')")
+    @PreAuthorize(value = "hasAuthority('ROL_ADMIN')")
    public ResponseEntity<UserResponseDTO> crearUsuario(@RequestBody UserRequestDTO request){
     	
     	//verifico si existe username
@@ -83,9 +87,18 @@ public class UserController {
     	//si no existe lo crea
     	
     	 //validacion. Cada punto en el builder es como un SET de User
+		
+    	Set<Rol> rolesDelUsuario = request.getRoles()
+			.stream()
+			.map(r -> Rol.builder().id(Long.parseLong(r)).build())
+			.collect(Collectors.toSet());	
+			
+    		
+    		
     	User newUser = User.builder()
 			    		   .username(request.getUsername())
-			    		   .password(request.getPassword())
+			    		   .password(new BCryptPasswordEncoder().encode(request.getPassword()))
+			    		   .roles(rolesDelUsuario)
 			    		   .build();
     	 
     	this.userService.crearUser(newUser);
